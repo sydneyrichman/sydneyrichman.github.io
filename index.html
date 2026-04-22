@@ -1,378 +1,708 @@
 <!DOCTYPE html>
-<!--[if IE 8 ]><html class="no-js oldie ie8" lang="en"> <![endif]-->
-<!--[if IE 9 ]><html class="no-js oldie ie9" lang="en"> <![endif]-->
-<!--[if (gte IE 9)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sydney Richman</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-   <!--- basic page needs
-   ================================================== -->
-   <meta charset="utf-8">
-	<title>Sydney</title>
-	<meta name="description" content="">  
-	<meta name="author" content="">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      background: #fdfcf7;
+      color: #1d1d1f;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
 
-   <!-- mobile specific metas
-   ================================================== -->
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    :root {
+      --bg: #fdfcf7;
+      --surface: #ffffff;
+      --border: #d2d2d7;
+      --text: #1d1d1f;
+      --muted: #1d1d1f;
+      --accent: #1d1d1f;
+      --apple-blue: #007aff;
+    }
 
- 	<!-- CSS
-   ================================================== -->
-   <link rel="stylesheet" href="css/base.css">  
-   <link rel="stylesheet" href="css/main.css">
-   <link rel="stylesheet" href="css/vendor.css">     
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 2000;
+      height: 52px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px;
+      background: rgba(253, 252, 247, 0.8);
+      backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-size: 17px; font-weight: 600; }
 
-   <!-- script
-   ================================================== -->   
-	<script src="js/modernizr.js"></script>
-	<script src="js/pace.min.js"></script>
+    section {
+      width: 100%;
+      padding: 100px 24px;
+      border-top: 1px solid var(--border);
+    }
+    section > * { max-width: 1100px; margin-left: auto; margin-right: auto; }
+    .section-eyebrow {
+      font-size: 12px; font-weight: 600; text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(32px, 5vw, 48px); font-weight: 700;
+      margin-bottom: 48px; letter-spacing: -0.02em;
+    }
 
-   <!-- favicons
-	================================================== -->
-	<link rel="icon" type="image/png" href="favicon.png">
+    .bg-photo {
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
 
+    /* ── Hero ── */
+    .hero {
+      min-height: 80vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      border-top: none;
+      background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('travel_photos/wallpaper.jpeg');
+      background-size: cover; background-position: center; background-attachment: fixed;
+    }
+    .hero .section-eyebrow { color: rgba(255,255,255,0.75); letter-spacing: 0.08em; }
+    .hero h1 { font-size: clamp(48px, 8vw, 96px); font-weight: 700; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 24px; color: #ffffff; }
+    .hero p { color: rgba(255,255,255,0.88); font-size: 21px; max-width: 600px; }
+
+    /* ── About Me ── */
+    #about-me {
+      background-image: linear-gradient(rgba(10,20,15,0.55), rgba(10,20,15,0.55)), url('travel_photos/wallpaper2.jpeg');
+    }
+    #about-me .section-eyebrow { color: rgba(180,220,195,0.85); }
+    #about-me .section-title   { color: #e8f5ec; }
+    #about-me .about-story p   { color: #d4eddb; font-size: 22px; line-height: 1.6; font-weight: 400; letter-spacing: -0.01em; }
+
+    /* ── Education ── */
+    #education {
+      background: linear-gradient(rgba(10,20,15,0.55), rgba(10,20,15,0.55)), url('travel_photos/wallpaper6.jpeg');
+      background-size: cover; background-position: center; background-attachment: fixed;
+    }
+    #education .section-eyebrow { color: rgba(180,220,195,0.85); }
+    #education .section-title   { color: #e8f5ec; }
+    .edu-card {
+      display: flex; align-items: flex-start; gap: 28px;
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 32px; padding: 40px;
+      max-width: 800px;
+      transition: all 0.4s cubic-bezier(0.23,1,0.32,1);
+    }
+    .edu-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.15); }
+    .edu-logo { font-size: 48px; flex-shrink: 0; }
+    .edu-info h3 { font-size: 22px; font-weight: 700; margin-bottom: 4px; color: #ffffff; }
+    .edu-info .edu-degree { font-size: 16px; color: #a8d8f0; font-weight: 500; margin-bottom: 16px; }
+    .edu-meta { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
+    .edu-meta span { font-size: 13px; color: rgba(200,230,215,0.9); background: rgba(255,255,255,0.12); padding: 4px 12px; border-radius: 100px; }
+    .edu-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .edu-tag { font-size: 13px; font-weight: 500; color: rgba(220,245,230,0.9); background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 100px; }
+
+    /* ── Skills ── */
+    #skills {
+      background: linear-gradient(rgba(10,20,15,0.55), rgba(10,20,15,0.55)), url('travel_photos/wallpaper7.jpeg');
+      background-size: cover; background-position: center; background-attachment: fixed;
+    }
+    #skills .section-eyebrow { color: rgba(180,220,195,0.85); }
+    #skills .section-title   { color: #e8f5ec; }
+    .skills-grid { display: flex; flex-direction: column; gap: 28px; max-width: 900px; }
+    .skill-row { display: flex; align-items: flex-start; gap: 20px; }
+    .skill-category { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(180,220,195,0.75); min-width: 100px; padding-top: 8px; }
+    .skill-pills { display: flex; flex-wrap: wrap; gap: 10px; }
+    .skill-pill {
+      font-size: 14px; font-weight: 500; color: rgba(220,245,230,0.9);
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 18px; border-radius: 100px;
+      transition: all 0.2s;
+    }
+    .skill-pill:hover { background: rgba(255,255,255,0.22); color: #ffffff; border-color: rgba(255,255,255,0.3); }
+
+    /* ── Experience ── */
+    #experience {
+      background-image: linear-gradient(rgba(15,20,40,0.6), rgba(15,20,40,0.6)), url('travel_photos/wallpaper3.jpeg');
+      background-size: cover; background-position: center; background-attachment: fixed;
+    }
+    #experience .section-eyebrow { color: rgba(180,195,230,0.85); }
+    #experience .section-title   { color: #e8ecf8; }
+    #experience .exp-item {
+      background: rgba(255,255,255,0.12); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.18);
+    }
+    #experience .exp-item h3     { color: #ffffff; }
+    #experience .exp-role        { color: #a8c4f0; }
+    #experience .exp-date,
+    #experience .exp-location    { color: rgba(200,210,240,0.8); }
+    #experience .exp-details li  { color: #d0d8f0; }
+    #experience .details-short p { color: #c8d4ee; }
+    #experience .control-btn     { color: #7eb8ff; }
+    #experience .exp-list::before { background: rgba(180,200,255,0.35); }
+    .resume-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 40px; padding: 14px 28px;
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 100px; color: white; font-size: 15px; font-weight: 600;
+      text-decoration: none; cursor: pointer;
+      transition: background 0.2s; max-width: 800px;
+    }
+    .resume-btn:hover { background: rgba(255,255,255,0.25); }
+
+    /* ── Projects ── */
+    #projects {
+      background-image: linear-gradient(rgba(35,15,10,0.55), rgba(35,15,10,0.55)), url('travel_photos/wallpaper4.jpeg');
+      background-size: cover; background-position: center; background-attachment: fixed;
+    }
+    #projects .section-eyebrow { color: rgba(240,210,195,0.85); }
+    #projects .section-title   { color: #f5ede8; }
+    #projects .nav-btn { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.25); color: #f5ede8; }
+    #projects .nav-btn:hover { background: rgba(255,255,255,0.25); }
+    #projects .proj-card {
+      background: rgba(255,248,244,0.12);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+    }
+    #projects .proj-card h3    { color: #ffffff; }
+    #projects .proj-card p[style*="color:var(--accent)"] { color: #f0c4a8 !important; }
+    #projects .proj-card p[style*="color:var(--muted)"]  { color: rgba(240,220,210,0.85) !important; }
+    #projects .timeline-labels { color: rgba(240,225,218,0.8); }
+    #projects #projCount       { color: rgba(240,225,218,0.7); }
+    #projects .progress-wrapper { background: rgba(255,255,255,0.2); }
+    #projects .progress-fill   { background: rgba(255,255,255,0.85); }
+
+    /* ── Carousel ── */
+    .carousel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .carousel-header .section-title { margin-bottom: 0; }
+    .nav-btn { padding: 10px 24px; border-radius: 100px; border: 1px solid var(--border); background: white; cursor: pointer; font-size: 14px; transition: background 0.2s; }
+    .nav-btn:hover { background: #f5f5f7; }
+    .carousel-container { position: relative; height: 400px; display: flex; align-items: center; justify-content: center; }
+    .proj-card {
+      position: absolute; width: 100%; max-width: 580px;
+      border-radius: 32px; padding: 40px;
+      transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+      opacity: 0; pointer-events: none;
+    }
+    .proj-card.active { opacity: 1; z-index: 10; transform: translateX(0) scale(1); pointer-events: auto; }
+    .proj-card.prev   { opacity: 0.3; z-index: 5; transform: translateX(-150px) scale(0.85) rotate(-4deg); }
+    .proj-card.next   { opacity: 0.3; z-index: 5; transform: translateX(150px) scale(0.85) rotate(4deg); }
+    .card-emoji { position: absolute; top: 24px; right: 24px; font-size: 32px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); user-select: none; }
+    .project-timeline { margin-top: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
+    .progress-wrapper { width: 100%; height: 4px; background: var(--border); border-radius: 10px; margin-bottom: 12px; }
+    .progress-fill    { height: 100%; background: var(--accent); width: 20%; transition: width 0.5s ease; border-radius: 10px; }
+    .timeline-labels  { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; font-weight: 600; }
+
+    /* ── Experience List ── */
+    .exp-list { position: relative; display: flex; flex-direction: column; gap: 36px; max-width: 800px; }
+    .exp-list::before { content: ""; position: absolute; left: 24px; top: 0; bottom: 0; width: 1px; background: var(--accent); opacity: 0.3; z-index: 0; }
+    .exp-item { position: relative; z-index: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; padding: 32px; transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+    .exp-item:hover { transform: translateY(-4px); border-color: #afafb3; box-shadow: 0 12px 30px rgba(0,0,0,0.04); }
+    .exp-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+    .exp-logo-placeholder { width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 32px; line-height: 1; background: #afafb3; box-shadow: 0 0 0 4px #afafb3; }
+    .exp-info h3 { font-size: 20px; font-weight: 600; color: var(--text); }
+    .exp-role    { font-size: 15px; color: var(--accent); font-weight: 500; }
+    .exp-meta    { margin-left: auto; text-align: right; display: flex; flex-direction: column; gap: 2px; }
+    .exp-date    { font-size: 14px; color: var(--muted); font-weight: 500; }
+    .exp-location { font-size: 13px; color: var(--muted); opacity: 0.8; }
+    .details-short, .details-dense { display: none; padding-left: 68px; margin-top: 8px; animation: fadeIn 0.3s ease forwards; }
+    [data-state="1"] .details-short { display: block; }
+    [data-state="2"] .details-dense { display: block; }
+    .exp-controls { padding-left: 68px; margin-top: 12px; display: flex; gap: 12px; }
+    .control-btn { background: none; border: none; color: var(--apple-blue); font-size: 14px; font-weight: 500; cursor: pointer; padding: 0; transition: opacity 0.2s; }
+    .control-btn:hover { opacity: 0.7; }
+    .more-btn { display: none; }
+    .deep-btn, .less-btn { display: none; }
+    [data-state="0"] .more-btn { display: inline-block; }
+    [data-state="1"] .deep-btn, [data-state="1"] .less-btn { display: inline-block; }
+    [data-state="2"] .less-btn { display: inline-block; }
+    .exp-details { list-style: none; padding-left: 0; font-size: 16px; line-height: 1.5; }
+    .exp-details li { margin-bottom: 8px; padding-left: 20px; position: relative; }
+    .exp-details li::before { content: "•"; position: absolute; left: 0; color: var(--accent); }
+
+    /* ── FAQ ── */
+    #faq { background: var(--bg); }
+    .faq-container { max-width: 800px; margin-top: 0; }
+    .faq-item { border-bottom: 1px solid var(--border); }
+    .faq-question-btn { width: 100%; padding: 22px 0; display: flex; justify-content: space-between; align-items: center; background: none; border: none; cursor: pointer; text-align: left; }
+    .faq-question-btn span { font-size: 18px; font-weight: 600; color: var(--text); }
+    .faq-chevron { width: 10px; height: 10px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform 0.3s cubic-bezier(0.23,1,0.32,1), border-color 0.3s; margin-right: 8px; flex-shrink: 0; }
+    .faq-item.active .faq-chevron { transform: rotate(-135deg); border-color: var(--apple-blue); }
+    .faq-item.active .faq-question-btn span { color: var(--apple-blue); }
+    .faq-answer-wrapper { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s ease-out; overflow: hidden; }
+    .faq-item.active .faq-answer-wrapper { grid-template-rows: 1fr; }
+    .faq-answer-content { min-height: 0; font-size: 16px; line-height: 1.6; color: #555; padding-bottom: 24px; max-width: 640px; }
+
+    /* ── Travel Map ── */
+    #inspiration {
+      background-image: linear-gradient(rgba(20,15,30,0.55), rgba(20,15,30,0.55)), url('travel_photos/wallpaper5.jpeg');
+    }
+    #inspiration .section-eyebrow { color: rgba(210,190,240,0.85); }
+    #inspiration .section-title   { color: #f0eaf8; }
+    #inspiration .pin-source      { color: rgba(200,185,225,0.75); }
+    .map-wrapper {
+      position: relative; width: 100%; height: 420px;
+      border-radius: 32px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.15);
+      margin-bottom: 48px;
+    }
+    #travel-map { height: 100%; width: 100%; }
+
+    /* ── Masonry Gallery ── */
+    .masonry-container { column-count: 4; column-gap: 12px; width: 100%; max-width: 1200px; margin: 0 auto; }
+    .pin-card { display: inline-block; width: 100%; margin-bottom: 20px; break-inside: avoid; cursor: pointer; }
+    .pin-card img { width: 100%; border-radius: 16px; display: block; transition: filter 0.2s ease; }
+    .pin-card:hover img { filter: brightness(0.85); }
+    .pin-meta { padding: 8px 4px; }
+    .pin-source { font-size: 12px; color: #767676; }
+
+    /* ── Connect / Contact ── */
+    #connect { background: linear-gradient(rgba(20,15,30,0.55), rgba(20,15,30,0.55)), url('travel_photos/wallpaper8.jpeg'); }
+    #connect .section-title   { color: #f0e7fb; }
+    #connect .section-eyebrow { color: #f0e7fb; }
+    .connect-btns { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 0; }
+    .connect-btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: #5d5361; color: #f0eaf8; border: 1px solid var(--border); border-radius: 100px; font-size: 15px; font-weight: 600; text-decoration: none; transition: opacity 0.2s; }
+    .connect-btn-primary:hover { background: #f5f5f7; color: #5d5361;}
+    .connect-btn-secondary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: #5d5361; color: #f0eaf8; border: 1px solid var(--border); border-radius: 100px; font-size: 15px; font-weight: 600; text-decoration: none; transition: background 0.2s; }
+    .connect-btn-secondary:hover { background: #f5f5f7; color: #5d5361;}
+
+    /* ── Footer ── */
+    footer { padding: 80px 24px; text-align: center; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); }
+
+    /* ── Animations ── */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── Responsive ── */
+    @media (max-width: 1024px) { .masonry-container { column-count: 3; } }
+    @media (max-width: 768px) {
+      .masonry-container { column-count: 2; }
+      .carousel-container { height: 500px; }
+      .card-emoji { top: 16px; right: 16px; font-size: 24px; }
+      .edu-card { flex-direction: column; gap: 16px; }
+      .skill-row { flex-direction: column; gap: 8px; }
+      .skill-category { min-width: unset; padding-top: 0; }
+    }
+    @media (max-width: 600px) {
+      .exp-header { flex-wrap: wrap; }
+      .exp-meta { width: 100%; margin-left: 68px; text-align: left; margin-top: -8px; }
+    }
+  </style>
 </head>
-
-<body id="top">
-
-	<!-- header 
-   ================================================== -->
-   <header>   	
-   	<div class="row">
-
-   		<div class="top-bar">
-   			<a class="menu-toggle" href="#"><span>Menu</span></a>
-
-	   		<div class="logo">
-		         <a href="index.html">SYDNEY</a>
-		      </div>		      
-
-		   	<nav id="main-nav-wrap">
-					<ul class="main-navigation">
-						<li class="current"><a class="smoothscroll"  href="#intro" title="">Home</a></li>
-						<li><a class="smoothscroll"  href="#about" title="">About</a></li>
-						<li><a class="smoothscroll"  href="#resume" title="">Resume</a></li>				
-						<li><a class="smoothscroll"  href="#contact" title="">Contact</a></li>				
-					</ul>
-				</nav>    		
-   		</div> <!-- /top-bar --> 
-   		
-   	</div> <!-- /row --> 		
-   </header> <!-- /header -->
-
-	<!-- intro section
-   ================================================== -->
-   <section id="intro">   
-
-   	<div class="intro-overlay"></div>	
-
-   	<div class="intro-content">
-   		<div class="row">
-
-   			<div class="col-twelve">
-
-	   			<h5>Hello, World.</h5>
-	   			<h1>I'm Sydney!</h1>
-
-	   			<p class="intro-position">
-	   				<span>CS + Econ Student @ UMD</span>
-	   			</p>
-
-	   			<a class="button stroke smoothscroll" href="#about" title="">More About Me</a>
-
-	   		</div>  
-   			
-   		</div>   		 		
-   	</div> <!-- /intro-content --> 
-
-   	<ul class="intro-social">        
-         <li><a href="https://www.linkedin.com/in/sydney-richman-8246b01b4/"><i class="fa fa-linkedin"></i></a></li>
-         <li><a href="https://www.instagram.com/sydneyrichmann/?hl=en"><i class="fa fa-instagram"></i></a></li>
-      </ul> <!-- /intro-social -->      	
-
-   </section> <!-- /intro -->
-
-
-   <!-- about section
-   ================================================== -->
-   <section id="about">  
-
-   	<div class="row section-intro">
-   		<div class="col-twelve">
-
-   			<h5>About</h5>
-   			<h1>Let me share a little about myself</h1>
-
-   			<div class="intro-info">
-
-   				<img src="images/DSC03660.JPG" class= "object-fill" alt="Profile Picture">
-
-   				<p class="lead">I'm Sydney from Queens, NY and I love trying new things! Some of my more recent hobbies have been weightlifting and learning Mandarin. I also love any sort of art project or adventure!</p>
-   			</div>   			
-
-   		</div>   		
-   	</div> <!-- /section-intro -->
-
-   	<div class="row button-section">
-   		<div class="col-twelve">
-   			<a href="#contact" title="Hire Me" class="button stroke smoothscroll">Hire Me</a>
-   		</div>   		
-   	</div>
-
-   </section> <!-- /process-->    
-
-
-   <!-- resume Section
-   ================================================== -->
-	<section id="resume" class="grey-section">
-
-		<div class="row section-intro">
-   		<div class="col-twelve">
-
-   			<h5>Resume</h5>
-   			<h1>Some of my credentials.</h1>
-
-   		</div>   		
-   	</div> <!-- /section-intro--> 
-
-   	<div class="row resume-timeline">
-
-   		<div class="col-twelve resume-header">
-
-   			<h2>Work Experience</h2>
-
-   		</div> <!-- /resume-header -->
-
-   		<div class="col-twelve">
-
-   			<div class="timeline-wrap">
-
-   				<div class="timeline-block">
-
-	   				<div class="timeline-ico">
-	   					<i class="fa fa-graduation-cap"></i>
-	   				</div>
-
-	   				<div class="timeline-header">
-	   					<h3>VP of Product Management</h3>
-	   					<p>August 2024 - November 2024</p>
-	   				</div>
-
-	   				<div class="timeline-content">
-	   					<h4>Dux</h4>
-	   					<p>• Identified a low conversion rate from profile creation to experience bookings by analyzing user drop-off points at each
-step. Proposed pre-made experiences, currently in development, which have received positive user feedback<br>
-• Initiated remote experience options after polling customers and guides, now in progress based on strong demand<br>
-• Worked to implement enhanced security features by researching similar platforms to ensure the safety of guides</p>
-	   				</div>
-
-	   			</div> <!-- /timeline-block -->
-
-	   			<div class="timeline-block">
-
-	   				<div class="timeline-ico">
-	   					<i class="fa fa-graduation-cap"></i>
-	   				</div>
-
-	   				<div class="timeline-header">
-	   					<h3>Software Engineer Intern</h3>
-	   					<p>June 2024 - August 2024</p>
-	   				</div>
-
-	   				<div class="timeline-content">
-	   					<h4>Dux</h4>
-	   					<p>• Implemented best UI/UX practices to optimize user experience and used wireframing to identify key endpoints and effectively distribute tasks across the team for streamlined development<br>
-• Executed API calls to dynamically display data, driving engagement on a platform now actively used by >100 users.</p>
-	   				</div>
-
-	   			</div> <!-- /timeline-block -->
-
-	   			<div class="timeline-block">
-
-	   				<div class="timeline-ico">
-	   					<i class="fa fa-graduation-cap"></i>
-	   				</div>
-
-	   				<div class="timeline-header">
-	   					<h3>Technology Organizer</h3>
-	   					<p>March 2024 - October 2024</p>
-	   				</div>
-
-	   				<div class="timeline-content">
-	   					<h4>Technica</h4>
-	   					<p>• Orchestrated the largest hackathon for underrepresented genders, attracting >1,200 participants, and created the hackathon website which included the registration Vue.js and AWS<br>
-• Developed a comprehensive app for Android and iOS featuring up-to-date schedules, personalized calendars, a detailed map of the venue, and a check-in scanner for organizers to efficiently manage hacker attendance</p>
-	   				</div>
-
-	   			</div> <!-- /timeline-block -->
-					   			<div class="timeline-block">
-
-	   				<div class="timeline-ico">
-	   					<i class="fa fa-graduation-cap"></i>
-	   				</div>
-
-	   				<div class="timeline-header">
-	   					<h3>Social Media Intern</h3>
-	   					<p>July 2024 - August 2024</p>
-	   				</div>
-
-	   				<div class="timeline-content">
-	   					<h4>Ladders for Leaders</h4>
-	   					<p>• Executed strategic growth plans, driving a 4.8% increase in social media followers, a 226.4% surge in engagement rates, and a 274.1% increase in accounts reached, growing from 800 to 5.4k users in 30 days<br>
-• Collaborated with over 20 related accounts and businesses to amplify audience engagement, sharing program information and valuable tips, while refining captions and posts for greater relevance</div>
-
-	   			</div> <!-- /timeline-block -->
-
-   			</div> <!-- /timeline-wrap -->   			
-
-   		</div> <!-- /col-twelve -->
-   		
-   	</div> <!-- /resume-timeline -->
-   	
-   	<div class="row resume-timeline">
-
-   		<div class="col-twelve resume-header">
-
-   			<h2>Education</h2>
-
-   		</div> <!-- /resume-header -->
-
-   		<div class="col-twelve">
-
-   			<div class="timeline-wrap">
-
-   				<div class="timeline-block">
-
-	   				<div class="timeline-ico">
-	   					<i class="fa fa-briefcase"></i>
-	   				</div>
-
-	   				<div class="timeline-header">
-	   					<h3>BS Degree</h3>
-	   					<p>August 2023 - Present</p>
-	   				</div>
-
-	   				<div class="timeline-content">
-	   					<h4>University of Maryland, College Park</h4>
-	   					<p>Alpha Kappa Psi Business Fraternity + Technica + Startup Shell</p>
-	   				</div>
-
-	   			</div> <!-- /timeline-block -->
-
-   			</div> <!-- /timeline-wrap -->   			
-
-   		</div> <!-- /col-twelve -->
-   		
-   	</div> <!-- /resume-timeline -->
-		
-	</section> <!-- /features -->
-
-	
-   <!-- contact
-   ================================================== -->
-	<section id="contact">
-
-		<div class="row section-intro">
-   		<div class="col-twelve">
-
-   			<h5>Contact</h5>
-   			<h1>Give me a shout!</h1>
-
-   		</div> 
-   	</div> <!-- /section-intro -->
-
-   	<div class="row contact-form">
-
-   		<div class="col-twelve">
-
-            <!-- form -->
-            <form name="contactForm" id="contactForm" method="post" action="">
-      			<fieldset>
-
-                  <div class="form-field">
- 						   <input name="contactName" type="text" id="contactName" placeholder="Name" value="" minlength="2" required="">
-                  </div>
-                  <div class="form-field">
-	      			   <input name="contactEmail" type="email" id="contactEmail" placeholder="Email" value="" required="">
-	               </div>
-                  <div class="form-field">
-	     				   <input name="contactSubject" type="text" id="contactSubject" placeholder="Subject" value="">
-	               </div>                       
-                  <div class="form-field">
-	                 	<textarea name="contactMessage" id="contactMessage" placeholder="message" rows="10" cols="50" required=""></textarea>
-	               </div>                      
-                 <div class="form-field">
-                     <button class="submitform">Submit</button>
-                     <div id="submit-loader">
-                        <div class="text-loader">Sending...</div>                             
-       				      <div class="s-loader">
-								  	<div class="bounce1"></div>
-								  	<div class="bounce2"></div>
-								  	<div class="bounce3"></div>
-								</div>
-							</div>
-                  </div>
-
-      			</fieldset>
-      		</form> <!-- Form End -->
-
-            <!-- contact-warning -->
-            <div id="message-warning">            	
-            </div>            
-            <!-- contact-success -->
-      		<div id="message-success">
-               <i class="fa fa-check"></i>Your message was sent, thank you!<br>
-      		</div>
-
-         </div> <!-- /col-twelve -->
-   		
-   	</div> <!-- /contact-form -->
-
-   	<div class="row contact-info">
-
-   		<div class="col-four tab-full collapse">
-
-   			<div class="icon">
-   				<i class="icon-mail"></i>
-   			</div>
-
-   			<h5>Email Me At</h5>
-
-   			<p>sydneyrichmann@gmail.com<br>		     
-			   </p>
-
-   		</div>
-
-   		<div class="col-four tab-full">
-
-   			<div class="icon">
-   				<i class="icon-phone"></i>
-   			</div>
-
-   			<h5>Call Me At</h5>
-
-   			<p>Phone: 917 573 4166
-			   </p>
-
-   		</div>
-   		
-   	</div> <!-- /contact-info -->
-		
-	</section> <!-- /contact -->
-
-
-   <!-- footer
-   ================================================== -->
-
-   <div id="preloader"> 
-    	<div id="loader"></div>
-   </div> 
-
-   <!-- Java Script
-   ================================================== --> 
-   <script src="js/jquery-2.1.3.min.js"></script>
-   <script src="js/plugins.js"></script>
-   <script src="js/main.js"></script>
-
+<body>
+  <nav>
+    <div class="nav-logo">Sydney</div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:20px;">
+      <span style="font-size:13px; font-weight:600; color:rgba(255,255,255,0.88); border:1.5px solid rgb(255,255,255,0.88); border-radius:100px; padding:6px 16px; letter-spacing:0.02em;">University of Maryland</span>
+      <span style="font-size:13px; font-weight:600; color:rgba(255,255,255,0.88); border:1.5px solid rgb(255,255,255,0.88); border-radius:100px; padding:6px 16px; letter-spacing:0.02em;">Computer Science</span>
+      <span style="font-size:13px; font-weight:600; color:rgba(255,255,255,0.88); border:1.5px solid rgb(255,255,255,0.88); border-radius:100px; padding:6px 16px; letter-spacing:0.02em;">Women, Gender &amp; Sexuality Studies</span>
+    </div>
+    <h1>Sydney Richman</h1>
+    <p style="font-size: 21px; color: white; max-width: 600px;">I've always had a love for creating products and building things, specifically ones that impact my community. I'm interested in working on new projects so feel free to reach out if you have something cool going on!</p>
+  </section>
+
+  <!-- ── ABOUT ME ── -->
+  <section id="about-me" class="bg-photo">
+    <p class="section-eyebrow">A little bit about me</p>
+    <h2 class="section-title">About Me</h2>
+    <div class="about-story">
+      <p>When I was 10, my favorite show was Dance Moms. I would dance infront of the TV with my dust-stained socks and begged my parents for ballet slippers (they said no). Once I had enough of begging, I grabbed every tool at my disposal, and created a pair of dance shoes with a roll of duct tape. After that, I wore them every morning while I'd watch (until I realized I wanted to be Abby Lee Miller and made my little brother one of the dancers). So what does this all mean? Well, I wanna work on projects that I'd use myself and that would let me be creative and challenge me to think about things in a new way.</p>
+    </div>
+  </section>
+
+  <!-- ── EDUCATION ── -->
+  <!-- <section id="education" class="bg-photo">
+    <p class="section-eyebrow">Where I Learn</p>
+    <h2 class="section-title">Education</h2>
+    <div class="edu-card">
+      <div class="edu-logo">🐢</div>
+      <div class="edu-info">
+        <h3>University of Maryland</h3>
+        <p class="edu-degree">B.S. Computer Science &amp; Women, Gender, and Sexuality Studies</p>
+        <div class="edu-meta">
+          <span>📍 College Park, MD</span>
+          <span>🎓 Class of 2027</span>
+        </div>
+        <div class="edu-tags">
+          <span class="edu-tag">Introduction to Computer Systems</span>
+          <span class="edu-tag">Discrete Structures</span>
+          <span class="edu-tag">Calculus 2</span>
+          <span class="edu-tag">Data Structures & Algorithms</span>
+          <span class="edu-tag">Linear Algebra</span>
+          <span class="edu-tag">Organization of Programming Languages</span>
+          <span class="edu-tag">Algorithms</span>
+          <span class="edu-tag">Mastering the PM Interview</span>
+          <span class="edu-tag">Game Theory</span>
+          <span class="edu-tag">Machine Learning</span>
+          <span class="edu-tag">Communications Networks and Services</span>
+        </div>
+      </div>
+    </div>
+  </section> -->
+
+  <!-- ── SKILLS ── -->
+  <!-- <section id="skills" class="bg-photo">
+    <p class="section-eyebrow">What I Work With</p>
+    <h2 class="section-title">Skills</h2>
+    <div class="skills-grid">
+      <div class="skill-row">
+        <span class="skill-category">Languages</span>
+        <div class="skill-pills">
+          <span class="skill-pill">Java</span>
+          <span class="skill-pill">Python</span>
+          <span class="skill-pill">OCaml</span>
+          <span class="skill-pill">HTML / CSS / Javascript</span>
+          <span class="skill-pill">React</span>
+          <span class="skill-pill">Vue</span>
+          <span class="skill-pill">React Native</span>
+        </div>
+      </div>
+      <div class="skill-row">
+        <span class="skill-category">Frameworks & Tools</span>
+        <div class="skill-pills">
+          <span class="skill-pill">Git</span>
+          <span class="skill-pill">MongoDB</span>
+          <span class="skill-pill">AWS (Amazon Web Services)</span>
+          <span class="skill-pill">Figma</span>
+          <span class="skill-pill">CAD</span>
+          <span class="skill-pill">JUnit</span>
+        </div>
+      </div>
+    </div>
+  </section> -->
+
+  <!-- ── EXPERIENCE ── -->
+  <section id="experience" class="bg-photo">
+    <p class="section-eyebrow">Professional</p>
+    <h2 class="section-title">Experience</h2>
+
+    <div class="exp-list">
+
+      <div class="exp-item" data-state="1">
+        <div class="exp-header">
+          <div class="exp-logo-placeholder">🍎</div>
+          <div class="exp-info">
+            <h3>Apple</h3>
+            <p class="exp-role">Incoming Software Engineering Intern</p>
+          </div>
+          <div class="exp-meta">
+            <p class="exp-date">Summer 2026</p>
+            <p class="exp-location"><i>"Howdy"</i></p>
+          </div>
+        </div>
+        <div class="details-short"><p>Joining the Marcom Platforms & Services team to build Apple.com.</p></div>
+        <div class="details-dense">
+          <ul class="exp-details"><li>Hold your horses! I haven't started yet!</li></ul>
+        </div>
+        <div class="exp-controls">
+          <button class="control-btn more-btn" onclick="updateExpState(this, 1)">Learn More</button>
+          <button class="control-btn deep-btn" onclick="updateExpState(this, 2)">Deep Dive</button>
+          <button class="control-btn less-btn" onclick="updateExpState(this, 0)">Show Less</button>
+        </div>
+      </div>
+
+      <div class="exp-item" data-state="1">
+        <div class="exp-header">
+          <div class="exp-logo-placeholder">📦</div>
+          <div class="exp-info">
+            <h3>Amazon</h3>
+            <p class="exp-role">Software Development Engineer Intern</p>
+          </div>
+          <div class="exp-meta">
+            <p class="exp-date">May 2025 — Aug 2025</p>
+            <p class="exp-location"><i>"I'm walkin' here!"</i></p>
+          </div>
+        </div>
+        <div class="details-short"><p>Worked on the Manage Your Growth platform to help sellers optimize profits.</p></div>
+        <div class="details-dense">
+          <ul class="exp-details">
+            <li>Built an inline action feature within the MYG platform that reduced the number of clicks required to complete an action, increasing click-through rate and improving user experience</li>
+            <li>Created a frontend interface to display recommendation data, ensuring seamless interaction between APIs, the database, and the user interface; developed backend functionality by designing schemas, implementing resolvers, and integrating two APIs (preview and submission), enabling real-time data retrieval and user submissions</li>
+            <li>Improved reliability by writing unit and integration tests and leveraging AWS services such as Lambda and CloudWatch to validate API connectivity and monitor system health</li>
+            <li>Collaborated with product managers, designers, and partner teams to define project scope, expectations, and system design; authored a comprehensive design document and system diagrams to communicate architecture and API interactions</li>
+          </ul>
+        </div>
+        <div class="exp-controls">
+          <button class="control-btn more-btn" onclick="updateExpState(this, 1)">Learn More</button>
+          <button class="control-btn deep-btn" onclick="updateExpState(this, 2)">Deep Dive</button>
+          <button class="control-btn less-btn" onclick="updateExpState(this, 0)">Show Less</button>
+        </div>
+      </div>
+
+      <div class="exp-item" data-state="1">
+        <div class="exp-header">
+          <div class="exp-logo-placeholder">🦆</div>
+          <div class="exp-info">
+            <h3>Dux</h3>
+            <p class="exp-role">VP of Product</p>
+          </div>
+          <div class="exp-meta">
+            <p class="exp-date">August 2024 — October 2024</p>
+            <p class="exp-location"><i>"Where's the Old Bay?"</i></p>
+          </div>
+        </div>
+        <div class="details-short"><p>Led product strategy for a personalized college tour platform.</p></div>
+        <div class="details-dense">
+          <ul class="exp-details">
+            <li>Lead the end-to-end development of 'Pre-made' and 'Remote' experience features, by identifying user interest via feedback forms and customer polling, resulting in a 10x growth in guide acquisition 5 to more than 50</li>
+            <li>Identified a low conversion rate by analyzing user drop-off points at each step; therefore, optimized the guide onboarding funnel by redesigning profile requirements, reducing completion time by 50% while maintaining data integrity; successfully moved the feature from user research through to production deployment</li>
+            <li>Executed A/B tests on ads to gather data-driven insights that optimized for maximum reach and conversion</li>
+          </ul>
+        </div>
+        <div class="exp-controls">
+          <button class="control-btn more-btn" onclick="updateExpState(this, 1)">Learn More</button>
+          <button class="control-btn deep-btn" onclick="updateExpState(this, 2)">Deep Dive</button>
+          <button class="control-btn less-btn" onclick="updateExpState(this, 0)">Show Less</button>
+        </div>
+      </div>
+
+      <div class="exp-item" data-state="1">
+        <div class="exp-header">
+          <div class="exp-logo-placeholder">🦆</div>
+          <div class="exp-info">
+            <h3>Dux</h3>
+            <p class="exp-role">Software Engineer Intern + UI/UX Designer</p>
+          </div>
+          <div class="exp-meta">
+            <p class="exp-date">June 2024 - August 2024</p>
+            <p class="exp-location"><i>"Where's the Old Bay?"</i></p>
+          </div>
+        </div>
+        <div class="details-short"><p>Built a platform for personalized college tours.</p></div>
+        <div class="details-dense">
+          <ul class="exp-details">
+            <li>Developed a scalable full-stack platform using MongoDB, designing custom schemas and APIs to streamline data flow and delivering a responsive frontend that reached more than 100 active users within the first three months</li>
+            <li>Designed and wireframed a scalable user interface from scratch, prioritizing intuitive navigation and user flow, which served as the blueprint for the entire frontend architecture</li>
+          </ul>
+        </div>
+        <div class="exp-controls">
+          <button class="control-btn more-btn" onclick="updateExpState(this, 1)">Learn More</button>
+          <button class="control-btn deep-btn" onclick="updateExpState(this, 2)">Deep Dive</button>
+          <button class="control-btn less-btn" onclick="updateExpState(this, 0)">Show Less</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── PROJECTS ── -->
+  <section id="projects" class="bg-photo">
+    <div class="carousel-header">
+      <div>
+        <p class="section-eyebrow">Things I'm Building</p>
+        <h2 class="section-title" style="margin-bottom:0;">Projects</h2>
+      </div>
+      <div class="carousel-nav-btns">
+        <button class="nav-btn" onclick="moveCarousel(-1)">Left</button>
+        <button class="nav-btn" onclick="moveCarousel(1)">Right</button>
+      </div>
+    </div>
+
+    <div class="carousel-container" id="carousel">
+      <div class="proj-card active">
+        <span class="card-emoji">🚗</span>
+        <h3>Parking App</h3>
+        <p style="color:#f0c4a8; font-weight:500; margin-top:10px;">Figma</p>
+        <p style="font-size:15px; color:rgba(240,220,210,0.85); margin-top:15px;">I got tired of waiting for street parking everynight with my Dad so I prototyped an app and made a business plan. It would connect drivers coming and going within a geographical radius and I sent it to TONS of people and the only one who replied was the founder of Waze, Uri Levine. He gave me feedback and my designs fatal flaws. Nontheless, his kindess and support along with the possiblities of what computer science could do made me want to study Computer Science and keep building.</p>
+      </div>
+      <div class="proj-card next">
+        <span class="card-emoji">🏋🏻‍♀️</span>
+        <h3>Partment Pal</h3>
+        <p style="color:#f0c4a8; font-weight:500; margin-top:10px;">HTML, CSS, Javascript</p>
+        <p style="font-size:15px; color:rgba(240,220,210,0.85); margin-top:15px;">I built a website for my aparment's gym during the pandemic to organize sign ups, collect vaccination cards, and provide an occupancy tracker. Over 60 people used it and I recieved a free gym membership!</p>
+      </div>
+      <div class="proj-card">
+        <span class="card-emoji">🍱</span>
+        <h3>ALLerGy</h3>
+        <p style="color:#f0c4a8; font-weight:500; margin-top:10px;">HTML, CSS, Javascript</p>
+        <p style="font-size:15px; color:rgba(240,220,210,0.85); margin-top:15px;">After my brother had an allergic reaction at a restaurant due to human error, I built a web app that would curate a menu from a restaurant based on a persons allergies.</p>
+      </div>
+      <div class="proj-card">
+        <span class="card-emoji">🏡</span>
+        <h3>Roome</h3>
+        <p style="color:#f0c4a8; font-weight:500; margin-top:10px;">React, MongoDB</p>
+        <p style="font-size:15px; color:rgba(240,220,210,0.85); margin-top:15px;">Built this at a hackathon; essentially Tinder for roommates.</p>
+      </div>
+      <div class="proj-card">
+        <span class="card-emoji">🥒</span>
+        <h3>Chris and Eric's Small Batch Pickles</h3>
+        <p style="color:#f0c4a8; font-weight:500; margin-top:10px;">HTML, CSS, Javascript</p>
+        <p style="font-size:15px; color:rgba(240,220,210,0.85); margin-top:15px;">I worked with the founders of a local pickle company to design and develop a website showcasing their products, story, and information.</p>
+      </div>
+    </div>
+
+    <div class="project-timeline">
+      <div class="progress-wrapper"><div class="progress-fill" id="projBar"></div></div>
+      <div class="timeline-labels"><span>2020</span><span>2022</span><span>2023</span><span>2023</span><span>2024</span></div>
+      <p style="text-align:center; font-size:14px; margin-top:10px;" id="projCount">1 OF 5</p>
+    </div>
+  </section>
+
+  <!-- ── AROUND THE WORLD (Travel Map + Gallery) ── -->
+  <section id="inspiration" class="bg-photo">
+    <p class="section-eyebrow">Study Abroad Photos</p>
+    <h2 class="section-title">Around the World</h2>
+
+    <div class="masonry-container" id="masonry-grid"></div>
+
+    <div class="map-wrapper">
+      <div id="travel-map"></div>
+    </div>
+  </section>
+
+  <!-- ── CONNECT ── -->
+  <section id="connect">
+    <p class="section-eyebrow">Get In Touch</p>
+    <h2 class="section-title">Let's Talk</h2>
+    <div style="max-width:700px;">
+      <p style="font-size:20px; line-height:1.6; color: #f0e7fb; margin-bottom:40px;">Whether you have a project idea, want to collaborate, or just want to say hi — my inbox is always open.</p>
+      <div class="connect-btns">
+        <a href="mailto:sydneyrichmann@gmail.com" class="connect-btn-primary">✉️ Email Me</a>
+        <a href="https://linkedin.com/in/sydney-richman-8246b01b4" target="_blank" class="connect-btn-secondary">💼 LinkedIn</a>
+        <a href="https://github.com/sydneyrichman" target="_blank" class="connect-btn-secondary">🐙 GitHub</a>
+        <a href="resume.pdf" download class="connect-btn-secondary">📄 Resume</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Sydney &bull; University of Maryland '27</p>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const travelMap = L.map('travel-map', { zoomControl: true, scrollWheelZoom: false }).setView([48, 15], 4);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+      maxZoom: 19
+    }).addTo(travelMap);
+
+    const travelSpots = [
+      { name: "London, U.K.", lat: 51.5074, lng: -0.1278 },
+      { name: "Rome, Italy", lat: 41.9028, lng: 12.4964 },
+      { name: "Budapest, Hungary", lat: 47.4979, lng: 19.0402 },
+      { name: "Venice, Italy", lat: 45.4408, lng: 12.3155 },
+      { name: "Lisbon, Portugal", lat: 38.7223, lng: -9.1393 },
+      { name: "Porto, Portugal", lat: 41.1579, lng: -8.6291 },
+      { name: "Granada, Spain", lat: 37.1773, lng: -3.5986 },
+      { name: "Dublin, Ireland", lat: 53.3498, lng: -6.2603 },
+      { name: "Cliffs of Moher, Ireland", lat: 52.9720, lng: -9.4266 },
+      { name: "Grindelwald, Switzerland", lat: 46.6240, lng: 8.0414 },
+      { name: "Lauterbrunnen, Switzerland", lat: 46.5931, lng: 7.9091 },
+      { name: "Valencia, Spain", lat: 39.4699, lng: -0.3763 },
+      { name: "Toledo, Spain", lat: 39.8628, lng: -4.0273 },
+      { name: "Nice, France", lat: 43.7102, lng: 7.2620 },
+      { name: "Madrid, Spain", lat: 40.4168, lng: -3.7038 },
+      { name: "Barcelona, Spain", lat: 41.3851, lng: 2.1734 },
+      { name: "Pisa, Italy", lat: 43.7228, lng: 10.4017 },
+      { name: "Dubrovnik, Croatia", lat: 42.6507, lng: 18.0944 },
+    ];
+
+    const pinIcon = L.divIcon({
+      className: '',
+      html: '<div style="width:12px;height:12px;background:#1d1d1f;border-radius:50%;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',
+      iconSize: [12, 12], iconAnchor: [6, 6]
+    });
+
+    travelSpots.forEach(spot => {
+      L.marker([spot.lat, spot.lng], { icon: pinIcon })
+        .addTo(travelMap)
+        .bindPopup(`<strong>${spot.name}</strong>`, { closeButton: false });
+    });
+
+    const grid = document.getElementById('masonry-grid');
+    const pinsData = [
+      { source: "London, U.K.", src: "travel_photos/DSC00503.JPG" },
+      { source: "Rome, Italy", src: "travel_photos/rome_me.jpg" },
+      { source: "Budapest, Hungary", src: "travel_photos/long4.png" },
+      { source: "Venice, Italy", src: "travel_photos/long5.png" },
+      { source: "Venice, Italy", src: "travel_photos/rome_me2.jpg" },
+      { source: "Rome, Italy", src: "travel_photos/rome_me3.jpg" },
+      { source: "Lisbon, Portugal", src: "travel_photos/matches.png" },
+      { source: "Rome, Italy", src: "travel_photos/rome_me4.jpg" },
+      { source: "Budapest, Hungary", src: "travel_photos/long3.png" },
+      { source: "Budapest, Hungary", src: "travel_photos/DSC01374.JPG" },
+      { source: "Lauterbrunnen, Switzerland", src: "travel_photos/switzerland_me.jpg" },
+      { source: "London, U.K.", src: "travel_photos/DSC00454.JPG" },
+      { source: "Lisbon, Portugal", src: "travel_photos/DSC00864.JPG" },
+      { source: "Lisbon, Portugal", src: "travel_photos/DSC00913.JPG" },
+      { source: "Lisbon, Portugal", src: "travel_photos/DSC00922.JPG" },
+      { source: "Lisbon, Portugal", src: "travel_photos/DSC00925 2.JPG" },
+      { source: "Porto, Portugal", src: "travel_photos/DSC00949.JPG" },
+      { source: "Porto, Portugal", src: "travel_photos/DSC00967.JPG" },
+      { source: "Granada, Spain", src: "travel_photos/long2.png" },
+      { source: "Dublin, Ireland", src: "travel_photos/DSC01061.JPG" },
+      { source: "Cliffs of Moher, Ireland", src: "travel_photos/DSC01133.JPG" },
+      { source: "Budapest, Hungary", src: "travel_photos/DSC01353.JPG" },
+      { source: "Dublin, Ireland", src: "travel_photos/DSC01089.JPG" },
+      { source: "Grindelwald, Switzerland", src: "travel_photos/DSC01619.JPG" },
+      { source: "London, U.K.", src: "travel_photos/DSC00448.JPG" },
+      { source: "London, U.K.", src: "travel_photos/DSC00451.JPG" },
+      { source: "Pisa, Italy", src: "travel_photos/long1.png" },
+      { source: "Granada, Spain", src: "travel_photos/DSC00797 3.JPG" },
+      { source: "Valencia, Spain", src: "travel_photos/DSC00128 2.JPG" },
+      { source: "Toledo, Spain", src: "travel_photos/DSC00189.JPG" },
+      { source: "Nice, France", src: "travel_photos/DSC00336.JPG" },
+      { source: "Nice, France", src: "travel_photos/DSC00299.JPG" },
+      { source: "Nice, France", src: "travel_photos/nice1.png" },
+      { source: "Madrid, Spain", src: "travel_photos/madridho.png" },
+      { source: "Dubrovnik, Croatia", src: "travel_photos/cro3.png" },
+      { source: "Nice, France", src: "travel_photos/nice2.png" },
+      { source: "Madrid, Spain", src: "travel_photos/madme.png" },
+      { source: "Barcelona, Spain", src: "travel_photos/barc1.png" },
+      { source: "Barcelona, Spain", src: "travel_photos/barc2.png" },
+      { source: "Barcelona, Spain", src: "travel_photos/barc3.png" },
+      { source: "Nice, France", src: "travel_photos/nice3.png" },
+      { source: "Madrid, Spain", src: "travel_photos/madrid.png" },
+      { source: "Valencia, Spain", src: "travel_photos/DSC00156.JPG" },
+      { source: "Lauterbrunnen, Switzerland", src: "travel_photos/switzerland_me2.jpg" },
+      { source: "Dublin, Ireland", src: "travel_photos/pinkfloor.png" },
+      { source: "Dubrovnik, Croatia", src: "travel_photos/cro1.png" },
+      { source: "Dubrovnik, Croatia", src: "travel_photos/cro2.png" },
+    ];
+    pinsData.forEach(pin => {
+      const card = document.createElement('div');
+      card.className = 'pin-card';
+      card.innerHTML = `<img src="${pin.src}" alt="${pin.source}"><div class="pin-meta"><div class="pin-source">${pin.source}</div></div>`;
+      grid.appendChild(card);
+    });
+
+    let cur = 0;
+    const cards = document.querySelectorAll('.proj-card');
+    const bar   = document.getElementById('projBar');
+    const count = document.getElementById('projCount');
+    function moveCarousel(dir) {
+      cur = (cur + dir + cards.length) % cards.length;
+      cards.forEach((c, i) => {
+        c.classList.remove('active', 'prev', 'next');
+        if (i === cur) c.classList.add('active');
+        else if (i === (cur - 1 + cards.length) % cards.length) c.classList.add('prev');
+        else if (i === (cur + 1) % cards.length) c.classList.add('next');
+      });
+      bar.style.width = ((cur + 1) / cards.length) * 100 + "%";
+      count.innerText = (cur + 1) + " OF " + cards.length;
+    }
+
+    function updateExpState(button, newState) {
+      const item = button.closest('.exp-item');
+      item.setAttribute('data-state', newState);
+      if (newState !== 0) item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    document.querySelectorAll('.faq-question-btn').forEach(button => {
+      button.addEventListener('click', () => button.parentElement.classList.toggle('active'));
+    });
+  </script>
 </body>
-
 </html>
